@@ -3,11 +3,11 @@ import sdl2
 import sdl2/ttf
 
 type
-  Pixel = object
+  Pixel* = object
     red*: byte
     green*: byte
     blue*: byte
-  FrameBuffer*[R, C: static[int]] =
+  FrameBuffer*[R, C: static[int]] = ref
     array[R, array[C, Pixel]]
 
 
