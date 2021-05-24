@@ -23,12 +23,12 @@ template sdlFailIf(condition: typed, reason: string) =
   )
 
 proc paint*(fb : FrameBuffer) =
-  sdlFailIf(not sdl2.init(INIT_VIDEO or INIT_TIMER or INIT_EVENTS)):
+  sdlFailIf(not sdl2.init(INIT_VIDEO or INIT_TIMER or INIT_EVENTS).toBool):
     "SDL2 initialization failed"
   defer: sdl2.quit()
 
   let window = createWindow(
-    title = "Pong",
+    title = "FrameBuffer",
     x = SDL_WINDOWPOS_CENTERED,
     y = SDL_WINDOWPOS_CENTERED,
     w = WindowWidth,
@@ -47,28 +47,20 @@ proc paint*(fb : FrameBuffer) =
   sdlFailIf renderer.isNil: "renderer could not be created"
   defer: renderer.destroy()
   renderer.clear
-  renderer.setDrawColor 255, 255, 255, 255 # white
-  for x in 0..10:
-    for y in 0..10:
-      renderer.drawPoint(cint(x),cint(y))
+  for r_index, row in fb:
+    for c_index, pixel in row:
+      renderer.setDrawColor pixel.red, pixel.green, pixel.blue, 255
+      renderer.drawPoint(cint(c_index),cint(r_index))
   renderer.present()
 
   var running = true
   while running:
     var event = defaultEvent
 
-    while pollEvent(event):
+    while pollEvent(event).toBool:
       case event.kind
       of QuitEvent:
         running = false
         break
       else:
         discard
-
-# var fb : FrameBuffer[400, 400]
-# for row in 0..200:
-#   for col in 0..100:
-#     fb[row][col].red = 128u8
-#     fb[row][col].green = 128u8
-#     fb[row][col].blue = 128u8
-# fb.paint()
