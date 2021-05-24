@@ -1,6 +1,12 @@
 # nimRasterizer
 
-The Beginnings of a simple triangle rasterizer in Nim.
+The Beginnings of a humble triangle rasterizer in Nim.
+
+# Status
+
+Draws a boring rectangle...
+
+![](docs/status.png)
 
 # Installing
 ```bash
