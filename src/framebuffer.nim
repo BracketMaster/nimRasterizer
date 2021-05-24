@@ -7,7 +7,7 @@ type
     red*: byte
     green*: byte
     blue*: byte
-  FrameBuffer*[R, C: static[int]] = ref
+  FrameBuffer*[R, C: static[int]] =
     array[R, array[C, Pixel]]
 
 
@@ -23,6 +23,8 @@ template sdlFailIf(condition: typed, reason: string) =
   )
 
 proc paint*(fb : FrameBuffer) =
+  var width  = fb[0].high
+  var height = fb.high
   sdlFailIf(not sdl2.init(INIT_VIDEO or INIT_TIMER or INIT_EVENTS).toBool):
     "SDL2 initialization failed"
   defer: sdl2.quit()
@@ -31,8 +33,8 @@ proc paint*(fb : FrameBuffer) =
     title = "FrameBuffer",
     x = SDL_WINDOWPOS_CENTERED,
     y = SDL_WINDOWPOS_CENTERED,
-    w = WindowWidth,
-    h = WindowHeight,
+    w = width,
+    h = height,
     flags = SDL_WINDOW_SHOWN
   )
 
@@ -50,7 +52,7 @@ proc paint*(fb : FrameBuffer) =
   for r_index, row in fb:
     for c_index, pixel in row:
       renderer.setDrawColor pixel.red, pixel.green, pixel.blue, 255
-      renderer.drawPoint(cint(c_index),cint(r_index))
+      renderer.drawPoint(cint(c_index),cint(height - r_index - 1))
   renderer.present()
 
   var running = true
