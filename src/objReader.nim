@@ -7,31 +7,8 @@
 # f v/vt/vn v/vt/vn v/vt/vn v/vt/vn
 # ===============================
 import parseutils, strutils, sequtils, macros
-import print
-import sugar
-
-type
-    Vector* = object
-        x* : float32
-        y* : float32
-        z* : float32
-
-    Texture* = object
-        u* : float32
-        v* : float32
-        w* : float32
-
-    Triangle* = object
-        v1*         : Vector
-        vt1*        : Texture
-        vn1*        : Vector
-        v2*         : Vector
-        vt2*        : Texture
-        vn2*        : Vector
-        v3*         : Vector
-        vt3*        : Texture
-        vn3*        : Vector
-
+import print, sugar
+import core
 
 proc stripWhiteSpace(str : var string) =
     var index = skipWhile(str, Whitespace)
@@ -146,20 +123,12 @@ proc readOBJ*(f : File) : seq[Triangle] =
     
     result = triangles
 
-# var triangle    = "f 24/1/24 25/2/25 26/3/26"
-# var dtype       = stripWord(triangle, 0)
-# for vert in 0..2:
-#     echo vert
-#     for attributes in 0..2:
-#         echo stripFaceInt(triangle, 0)
-#     echo ""
+proc test() = 
+    let african_head = "resources/african_head.obj".open
+    var triangles = african_head.readOBJ
 
-# echo stripWord(face, 0)
-# for i in 1..9:
-#     echo stripFaceInt(face, 0)
+    print(triangles.len)
+    print(triangles[13])
 
-let african_head = "resources/african_head.obj".open
-var triangles = african_head.readOBJ
-
-print(triangles.len)
-print(triangles[13])
+if isMainModule:
+    test()
