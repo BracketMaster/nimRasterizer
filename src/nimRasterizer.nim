@@ -2,20 +2,12 @@ import random, itertools, sugar
 import framebuffer, core, draw, colors
 import objReader, print, sequtils
 
-#let window_iter = slideWrap(arr, 2)
-# var arr = toSeq(0..2)
-# for grouping in windowed(arr & arr[0], 2):
-#     echo grouping
-const fb_width    = 400
-const fb_height   = 300
+const fb_width    = 800
+const fb_height   = 600
 var fb : FrameBuffer[fb_height, fb_width]
 
 let african_head = "resources/african_head.obj".open
 var triangles = african_head.readOBJ
-
-# var collect_values    = map(triangles, (el) => el.v1.y) 
-# print(max(collect_values))
-# print(min(collect_values))
 
 for triangle in triangles:
     var vertices = triangle.vertices
@@ -29,4 +21,5 @@ for triangle in triangles:
         var y1 = ((vertex_pair[1].y + 1.0) * ((fb_height - 1)/2)).toInt
         fb.line(fbCoord(x:x0, y:y0), fbCoord(x:x1, y:y1), WHITE)
 
+# fb.line(fbCoord(x:0, y:104), fbCoord(x:270, y:100), WHITE)
 fb.paint()

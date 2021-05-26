@@ -4,9 +4,9 @@ The Beginnings of a humble triangle rasterizer in Nim.
 
 # Status
 
-Draws a boring line...
+Draws a human head.
 
-![](docs/status.png)
+![](docs/status.jpg)
 
 # Installing
 ```bash
