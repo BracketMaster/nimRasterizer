@@ -9,17 +9,47 @@ var fb : FrameBuffer[fb_height, fb_width]
 let african_head = "resources/african_head.obj".open
 var triangles = african_head.readOBJ
 
-for triangle in triangles:
-    var vertices = triangle.vertices
-    # sliding window of two over vertices that wraps back around 
-    # since we concatenate with vertices[0]
-    for vertex_pair in windowed(vertices & vertices[0], 2):
-        var x0 = ((vertex_pair[0].x + 1.0) * ((fb_width - 1)/2)).toInt
-        var x1 = ((vertex_pair[1].x + 1.0) * ((fb_width - 1)/2)).toInt
+# proc cross(a,b :  Vectori) : Vectori = 
+#     var a1 = a.x; var a2 = a.y; var a3 = a.z
+#     var b1 = b.x; var b2 = b.y; var b3 = b.z
+#     result.x = a2*b3 - a3*b2
+#     result.y = -(a1*b3  - a3*b1)
+#     result.z = (a1*b2 - a2*b1)
 
-        var y0 = ((vertex_pair[0].y + 1.0) * ((fb_height - 1)/2)).toInt
-        var y1 = ((vertex_pair[1].y + 1.0) * ((fb_height - 1)/2)).toInt
-        fb.line(fbCoord(x:x0, y:y0), fbCoord(x:x1, y:y1), WHITE)
+# proc pointInTriangle(triangle : Triangle, P : Vectori) : bool = 
+#     var trianglei = triangle.verticesi()
+#     var A = trianglei[0]; var B = trianglei[1]; var C = trianglei[2]
+#     var vAC = C - A; var vAB = B - A; var vPA = A - P
 
-# fb.line(fbCoord(x:0, y:104), fbCoord(x:270, y:100), WHITE)
+#     var cross_product = cross(
+#         Vectori(x:vAB.x, y:vAC.x, z:vPA.x), 
+#         Vectori(x:vAB.y, y:vAC.y, z:vPA.y), 
+#     )
+#     var x = cross_product.x; var y = cross_product.y; var z = cross_product.z;
+
+#     # degenerate triangle, AKA, line or point
+#     if z == 0:
+#         return false
+
+#     # non-degenrate cases
+#     if (x + y) < -z:
+#         return false
+#     if z > 0:
+#         if y < 0:
+#             return false
+#         if x < 0:
+#             return false
+#     if z < 0:
+#         if y > 0:
+#             return false
+#         if x > 0:
+#             return false
+#     return true
+
+# proc triangleBounds()
+
+# render the head
+for triangle in triangles[60 .. 125]:
+    fb.wireT(triangle, fb_width, fb_height, WHITE)
+
 fb.paint()

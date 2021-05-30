@@ -57,9 +57,9 @@ proc stripFaceInt(str : var string, line_no : int) : int =
     str = str[index..^1]
 
 proc readOBJ*(f : File) : seq[Triangle] = 
-    var vertices            = newSeq[Vector](0)
-    var textures            = newSeq[Texture](0)
-    var normals             = newSeq[Vector](0)
+    var vertices            = newSeq[Vectorf](0)
+    var textures            = newSeq[TexCoord](0)
+    var normals             = newSeq[Vectorf](0)
     var triangles_to_parse  = newSeq[string](0)
     var triangles           = newSeq[Triangle](0)
 
@@ -79,21 +79,21 @@ proc readOBJ*(f : File) : seq[Triangle] =
         case dtype:
 
             of "v":
-                vertices.add(Vector(
+                vertices.add(Vectorf(
                     x : stripFloat(mut_line, line_no),
                     y : stripFloat(mut_line, line_no),
                     z : stripFloat(mut_line, line_no)
                 ))
 
             of "vn":
-                normals.add(Vector(
+                normals.add(Vectorf(
                     x : stripFloat(mut_line, line_no),
                     y : stripFloat(mut_line, line_no),
                     z : stripFloat(mut_line, line_no)
                 ))
 
             of "vt":
-                textures.add(Texture(
+                textures.add(TexCoord(
                     u : stripFloat(mut_line, line_no),
                     v : stripFloat(mut_line, line_no),
                     w : stripFloat(mut_line, line_no)
@@ -109,17 +109,16 @@ proc readOBJ*(f : File) : seq[Triangle] =
         var triangle_mut = dup(triangle)
         # substract 1 to form index as obj wavefront format by spec is 1-indexed
         # whilst nim Seq is 0-indexed
+        var getIndex = () => stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1
+        var (i_v1, i_t1, i_n1) = (getIndex(), getIndex(), getIndex())
+        var (i_v2, i_t2, i_n2) = (getIndex(), getIndex(), getIndex())
+        var (i_v3, i_t3, i_n3) = (getIndex(), getIndex(), getIndex())
         triangles.add(Triangle(
-            v1      : vertices[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            vt1     : textures[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            vn1     : normals[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            v2      : vertices[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            vt2     : textures[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            vn2     : normals[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            v3      : vertices[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            vt3     : textures[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1],
-            vn3     : normals[stripFaceInt(triangle_mut, line_begin_faces_offset + line_no) - 1]
-        ))
+            vertices : Vertices(a : vertices[i_v1], b : vertices[i_v2], c : vertices[i_v3]),
+            normals  : Normals(a : normals[i_n1], b : normals[i_n2], c : normals[i_n3]),
+            textures : Textures(a : textures[i_t1], b : textures[i_t2], c : textures[i_t3]),
+            )
+        )
     
     result = triangles
 

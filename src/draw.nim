@@ -1,6 +1,7 @@
 import framebuffer
 import core
 import colors
+import itertools
 
 proc lineByY(fb : var FrameBuffer, p1, p2 : fbCoord, color : Pixel) = 
     var dp      = p2 - p1
@@ -30,3 +31,16 @@ proc line*(fb : var FrameBuffer, p1, p2 : fbCoord, color : Pixel) =
         lineByX(fb, p1, p2, color)
     else:
         echo "skipped"
+
+proc wireT*(fb : var FrameBuffer, triangle : Triangle, buf_width : int, buf_height : int, color : Pixel) = 
+    var vertices = triangle.vertices
+    var verticesAsSeq = @[vertices.a, vertices.b, vertices.c, vertices.a]
+    # sliding window of two over vertices that wraps back around 
+    # since we concatenate with vertices[0]
+    for vertex_pair in windowed(verticesAsSeq, 2):
+        var x0 = ((vertex_pair[0].x + 1.0) * ((buf_width - 1)/2)).toInt
+        var x1 = ((vertex_pair[1].x + 1.0) * ((buf_width - 1)/2)).toInt
+
+        var y0 = ((vertex_pair[0].y + 1.0) * ((buf_height - 1)/2)).toInt
+        var y1 = ((vertex_pair[1].y + 1.0) * ((buf_height - 1)/2)).toInt
+        fb.line(fbCoord(x:x0, y:y0), fbCoord(x:x1, y:y1), color)
