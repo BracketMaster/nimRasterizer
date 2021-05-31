@@ -10,4 +10,4 @@ bin           = @["nimRasterizer"]
 
 # Dependencies
 
-requires "nim >= 1.4.6", "sdl2", "print", "itertools"
+requires "nim >= 1.4.6", "simplepng", "print", "itertools", "sdl2"

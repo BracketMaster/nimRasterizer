@@ -1,17 +1,23 @@
 type
-  fbCoord* = object
-    x*: int
-    y*: int
+  # fbCoord* = object
+  #   x*: int
+  #   y*: int
   
-  Vectorf* = object
+  Vector = ref object of RootObj
+  
+  Vector3f* = object of Vector
     x* : float32
     y* : float32
     z* : float32
 
-  Vectori* = object
+  Vector3i* = object of Vector
     x* : int
     y* : int
     z* : int
+
+  Vector2i* = object of Vector
+    x* : int
+    y* : int
 
   TexCoord* = object
     u* : float32
@@ -19,70 +25,67 @@ type
     w* : float32
 
   Vertices* = object
-    a* : Vectorf
-    b* : Vectorf
-    c* : Vectorf
+    a* : Vector3f
+    b* : Vector3f
+    c* : Vector3f
 
   Normals* = object
-    a* : Vectorf
-    b* : Vectorf
-    c* : Vectorf
+    a* : Vector3f
+    b* : Vector3f
+    c* : Vector3f
 
   Textures* = object
     a* : TexCoord
     b* : TexCoord
     c* : TexCoord
+
+  RasterTriangle* = object
+    a*  : Vector2i
+    b*  : Vector2i
+    c*  : Vector2i
   
-  Triangle* = object
+  VectorTriangle* = object
     vertices* : Vertices
     normals*  : Normals
     textures* : Textures
 
-proc `-`*(lhs, rhs: fbCoord) : fbCoord = 
-  result.x = lhs.x - rhs.x
-  result.y = lhs.y - rhs.y
+template `-`*[T : Vector2i](lhs, rhs: T) : T = 
+  T(
+    x : lhs.x - rhs.x,
+    y : lhs.y - rhs.y
+  )
 
-proc `-`*(lhs, rhs: Vectorf) : Vectorf = 
-  result.x = lhs.x - rhs.x
-  result.y = lhs.y - rhs.y
-  result.z = lhs.z - rhs.z
+template `+`*[T : Vector2i](lhs, rhs: T) : T = 
+  T(
+    x : lhs.x + rhs.x,
+    y : lhs.y + rhs.y
+  )
 
-proc `+`*(lhs, rhs: Vectorf) : Vectorf = 
-  result.x = lhs.x + rhs.x
-  result.y = lhs.y + rhs.y
-  result.z = lhs.z + rhs.z
+template `*`*[T : Vector2i](lhs : float32, rhs: T) : T = 
+  T(
+    x : (lhs * rhs.x.toFloat).toInt,
+    y : (lhs * rhs.y.toFloat).toInt
+  )
 
-proc `-`*(lhs, rhs: Vectori) : Vectori = 
-  result.x = lhs.x - rhs.x
-  result.y = lhs.y - rhs.y
-  result.z = lhs.z - rhs.z
+template cross*[T : Vector3i or Vector3f](a, b : T) : T = 
+    var a1 = a.x; var a2 = a.y; var a3 = a.z
+    var b1 = b.x; var b2 = b.y; var b3 = b.z
+    T(
+      x : a2*b3 - a3*b2,
+      y : -(a1*b3  - a3*b1),
+      z : (a1*b2 - a2*b1),
+    )
 
-proc `+`*(lhs, rhs: Vectori) : Vectori = 
-  result.x = lhs.x + rhs.x
-  result.y = lhs.y + rhs.y
-  result.z = lhs.z + rhs.z
+template `-`*[T : Vector3f or Vector3i](lhs, rhs : T) : T = 
+    T(
+      x : lhs.x - rhs.x,
+      y : lhs.y - rhs.y,
+      z : lhs.z - rhs.z,
+    )
 
-proc `+`*(lhs, rhs: fbCoord) : fbCoord = 
-  result.x = lhs.x + rhs.x
-  result.y = lhs.y + rhs.y
-
-proc `*`*(lhs : float32, rhs: fbCoord) : fbCoord = 
-  result.x = (lhs * rhs.x.toFloat).toInt
-  result.y = (lhs * rhs.y.toFloat).toInt
-
-proc toInt(vectorf : Vectorf) : Vectori = 
-  result.x = vectorf.x.toInt
-  result.y = vectorf.y.toInt
-  result.z = vectorf.z.toInt
-
-# proc verticesf*(triangle : Triangle): seq[Vectorf] = 
-#   return @[triangle.v1, triangle.v2, triangle.v3]
-
-# proc verticesi*(triangle : Triangle): seq[Vectori] = 
-#   return @[triangle.v1.toInt, triangle.v2.toInt, triangle.v3.toInt]
-
-# proc texturesf*(triangle : Triangle): seq[Texture] = 
-#   return @[triangle.vt1, triangle.vt2, triangle.vt3]
-
-# proc normalsf*(triangle : Triangle): seq[Vectorf] = 
-#   return @[triangle.vn1, triangle.vn2, triangle.vn3]
+template `+`*[T : Vector3f or Vector3i](lhs, rhs : T) : T = 
+    T(
+      x : lhs.x + rhs.x,
+      y : lhs.y + rhs.y,
+      z : lhs.z + rhs.z,
+    )

@@ -1,6 +1,8 @@
 import random
+import simplepng
 import sdl2
-import sdl2/ttf
+import print
+
 
 type
   Pixel* = object
@@ -10,10 +12,20 @@ type
   FrameBuffer*[R, C: static[int]] =
     array[R, array[C, Pixel]]
 
+## Write Resulting image to file
+proc paintPNG*(fb : FrameBuffer) =
+  var width  = fb[0].high
+  var height = fb.high
+  var p = initPixels(width + 1, height + 1)
+  p.fill(0'u8, 0'u8, 0'u8, 255)
 
-const
-  WindowWidth = 640
-  WindowHeight = 480
+  for r_index, row in fb:
+    for c_index, pixel in row:
+      p[c_index, height - r_index].setColor(pixel.red, pixel.blue, pixel.green, 255'u8)
+
+  simplePNG("sample.png", p)
+
+## Draw directly to screen
 
 type SDLException = object of Defect
 
@@ -22,7 +34,7 @@ template sdlFailIf(condition: typed, reason: string) =
     reason & ", SDL error " & $getError()
   )
 
-proc paint*(fb : FrameBuffer) =
+proc paintScreen*(fb : FrameBuffer) =
   var width  = fb[0].high
   var height = fb.high
   sdlFailIf(not sdl2.init(INIT_VIDEO or INIT_TIMER or INIT_EVENTS).toBool):

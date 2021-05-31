@@ -1,3 +1,4 @@
 src/framebuffer
 src/nimRasterizer
 src/objReader
+*.png

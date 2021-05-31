@@ -9,13 +9,6 @@ var fb : FrameBuffer[fb_height, fb_width]
 let african_head = "resources/african_head.obj".open
 var triangles = african_head.readOBJ
 
-# proc cross(a,b :  Vectori) : Vectori = 
-#     var a1 = a.x; var a2 = a.y; var a3 = a.z
-#     var b1 = b.x; var b2 = b.y; var b3 = b.z
-#     result.x = a2*b3 - a3*b2
-#     result.y = -(a1*b3  - a3*b1)
-#     result.z = (a1*b2 - a2*b1)
-
 # proc pointInTriangle(triangle : Triangle, P : Vectori) : bool = 
 #     var trianglei = triangle.verticesi()
 #     var A = trianglei[0]; var B = trianglei[1]; var C = trianglei[2]
@@ -46,10 +39,23 @@ var triangles = african_head.readOBJ
 #             return false
 #     return true
 
-# proc triangleBounds()
+type
+    bounds = tuple
+        upper_left  : int
+        upper_right : int
+        lower_left  : int
+        lower_right : int
+
+# proc triangleBounds(triangle : RasterTriangle) : bounds = 
+#     var verts = @[triangle.a, triangle.b, triangle.c]
+#     var x_coords = verts.map((triangle) => triangle.x)
+#     var y_coords = verts.map((triangle) => triangle.y)
+
 
 # render the head
-for triangle in triangles[60 .. 125]:
+
+for triangle in triangles:
     fb.wireT(triangle, fb_width, fb_height, WHITE)
 
-fb.paint()
+# fb.paintPNG()
+fb.paintScreen()

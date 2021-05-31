@@ -3,21 +3,21 @@ import core
 import colors
 import itertools
 
-proc lineByY(fb : var FrameBuffer, p1, p2 : fbCoord, color : Pixel) = 
+proc lineByY(fb : var FrameBuffer, p1, p2 : Vector2i, color : Pixel) = 
     var dp      = p2 - p1
     var y_count = abs(p2.y - p1.y)
     for add_Y in 0..y_count:
         var curr_p = p1 + (add_Y/y_count)*dp
         fb[curr_p.y][curr_p.x] = color
 
-proc lineByX(fb : var FrameBuffer, p1, p2 : fbCoord, color : Pixel) = 
+proc lineByX(fb : var FrameBuffer, p1, p2 : Vector2i, color : Pixel) = 
     var dp      = p2 - p1
     var x_count = abs(p2.x - p1.x)
     for add_X in 0..x_count:
         var curr_p = p1 + (add_X/x_count)*dp
         fb[curr_p.y][curr_p.x] = color
 
-proc line*(fb : var FrameBuffer, p1, p2 : fbCoord, color : Pixel) = 
+proc line*(fb : var FrameBuffer, p1, p2 : Vector2i, color : Pixel) = 
     var y_count = abs(p2.y - p1.y)
     var x_count = abs(p2.x - p1.x)
 
@@ -32,7 +32,7 @@ proc line*(fb : var FrameBuffer, p1, p2 : fbCoord, color : Pixel) =
     else:
         echo "skipped"
 
-proc wireT*(fb : var FrameBuffer, triangle : Triangle, buf_width : int, buf_height : int, color : Pixel) = 
+proc wireT*(fb : var FrameBuffer, triangle : VectorTriangle, buf_width : int, buf_height : int, color : Pixel) = 
     var vertices = triangle.vertices
     var verticesAsSeq = @[vertices.a, vertices.b, vertices.c, vertices.a]
     # sliding window of two over vertices that wraps back around 
@@ -43,4 +43,4 @@ proc wireT*(fb : var FrameBuffer, triangle : Triangle, buf_width : int, buf_heig
 
         var y0 = ((vertex_pair[0].y + 1.0) * ((buf_height - 1)/2)).toInt
         var y1 = ((vertex_pair[1].y + 1.0) * ((buf_height - 1)/2)).toInt
-        fb.line(fbCoord(x:x0, y:y0), fbCoord(x:x1, y:y1), color)
+        fb.line(Vector2i(x:x0, y:y0), Vector2i(x:x1, y:y1), color)

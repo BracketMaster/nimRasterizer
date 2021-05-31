@@ -56,12 +56,12 @@ proc stripFaceInt(str : var string, line_no : int) : int =
         quit()
     str = str[index..^1]
 
-proc readOBJ*(f : File) : seq[Triangle] = 
-    var vertices            = newSeq[Vectorf](0)
+proc readOBJ*(f : File) : seq[VectorTriangle] = 
+    var vertices            = newSeq[Vector3f](0)
     var textures            = newSeq[TexCoord](0)
-    var normals             = newSeq[Vectorf](0)
+    var normals             = newSeq[Vector3f](0)
     var triangles_to_parse  = newSeq[string](0)
-    var triangles           = newSeq[Triangle](0)
+    var triangles           = newSeq[VectorTriangle](0)
 
     # first, parse all the vertices, normals, and textures from
     # the file
@@ -79,14 +79,14 @@ proc readOBJ*(f : File) : seq[Triangle] =
         case dtype:
 
             of "v":
-                vertices.add(Vectorf(
+                vertices.add(Vector3f(
                     x : stripFloat(mut_line, line_no),
                     y : stripFloat(mut_line, line_no),
                     z : stripFloat(mut_line, line_no)
                 ))
 
             of "vn":
-                normals.add(Vectorf(
+                normals.add(Vector3f(
                     x : stripFloat(mut_line, line_no),
                     y : stripFloat(mut_line, line_no),
                     z : stripFloat(mut_line, line_no)
@@ -113,7 +113,7 @@ proc readOBJ*(f : File) : seq[Triangle] =
         var (i_v1, i_t1, i_n1) = (getIndex(), getIndex(), getIndex())
         var (i_v2, i_t2, i_n2) = (getIndex(), getIndex(), getIndex())
         var (i_v3, i_t3, i_n3) = (getIndex(), getIndex(), getIndex())
-        triangles.add(Triangle(
+        triangles.add(VectorTriangle(
             vertices : Vertices(a : vertices[i_v1], b : vertices[i_v2], c : vertices[i_v3]),
             normals  : Normals(a : normals[i_n1], b : normals[i_n2], c : normals[i_n3]),
             textures : Textures(a : textures[i_t1], b : textures[i_t2], c : textures[i_t3]),
