@@ -1,6 +1,6 @@
 import core
 
-proc projection*(triangle : VectorTriangle, width, height : int) : RasterTrianglei = 
+proc projectScreen*(triangle : VectorTriangle, width, height : int) : RasterTrianglei = 
     var verts = triangle.vertices
     var a_x = ((verts.a.x + 1.0) * ((width - 1)/2)).toInt
     var a_y = ((verts.a.y + 1.0) * ((height - 1)/2)).toInt
@@ -13,5 +13,3 @@ proc projection*(triangle : VectorTriangle, width, height : int) : RasterTriangl
         b : Vector2i(x : b_x, y : b_y),
         c : Vector2i(x : c_x, y : c_y)
     )
-
-# proc scaleToFB(triangle : RasterTrianglef) : RasterTrianglei = 
