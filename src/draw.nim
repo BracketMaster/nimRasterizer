@@ -3,44 +3,77 @@ import core
 import colors
 import itertools
 
-proc lineByY(fb : var FrameBuffer, p1, p2 : Vector2i, color : Pixel) = 
-    var dp      = p2 - p1
-    var y_count = abs(p2.y - p1.y)
-    for add_Y in 0..y_count:
-        var curr_p = p1 + (add_Y/y_count)*dp
-        fb[curr_p.y][curr_p.x] = color
+type Line* = tuple[p1: Vector2i, p2: Vector2i]
 
-proc lineByX(fb : var FrameBuffer, p1, p2 : Vector2i, color : Pixel) = 
-    var dp      = p2 - p1
-    var x_count = abs(p2.x - p1.x)
-    for add_X in 0..x_count:
-        var curr_p = p1 + (add_X/x_count)*dp
-        fb[curr_p.y][curr_p.x] = color
+proc lineLow(fb : var FrameBuffer, line : Line, color : Pixel) = 
+    var y0 = line.p1.y
+    var y1 = line.p2.y
+    var x0 = line.p1.x
+    var x1 = line.p2.x
 
-proc line*(fb : var FrameBuffer, p1, p2 : Vector2i, color : Pixel) = 
-    var y_count = abs(p2.y - p1.y)
-    var x_count = abs(p2.x - p1.x)
+    var dx = x1 - x0
+    var dy = y1 - y0
+    var yi = 1
+    if dy < 0:
+        yi = -1
+        dy = -dy
 
-    if (y_count == 0) and (x_count == 0):
-        fb[p1.y][p1.x] = color
-    elif y_count == x_count:
-        lineByX(fb, p1, p2, color)
-    elif y_count > x_count:
-        lineByY(fb, p1, p2, color)
-    elif x_count > y_count:
-        lineByX(fb, p1, p2, color)
+    var D = (2 * dy) - dx
+    var y = y0
+
+    for x in x0 .. x1:
+        fb[y][x] = color
+        if D > 0:
+            y = y + yi
+            D = D + (2 * (dy - dx))
+        else:
+            D = D + 2*dy
+
+proc lineHigh(fb : var FrameBuffer, line : Line, color : Pixel) = 
+    var y0 = line.p1.y
+    var y1 = line.p2.y
+    var x0 = line.p1.x
+    var x1 = line.p2.x
+
+    var dx = x1 - x0
+    var dy = y1 - y0
+    var xi = 1
+
+    if dx < 0:
+        xi = -1
+        dx = -dx
+
+    var D = (2 * dx) - dy
+    var x = x0
+
+    for y in y0 .. y1:
+        fb[y][x] = color
+        if D > 0:
+            x = x + xi
+            D = D + (2 * (dx - dy))
+        else:
+            D = D + 2*dx
+
+proc line*(fb : var FrameBuffer, line : Line, color : Pixel) = 
+    var y0 = line.p1.y
+    var y1 = line.p2.y
+    var x0 = line.p1.x
+    var x1 = line.p2.x
+
+    if abs(y1 - y0) < abs(x1 - x0):
+        if x0 > x1:
+            fb.lineLow((p1 : Vector2i(x : x1, y : y1), p2 : Vector2i(x : x0, y : y0)), color)
+        else:
+            fb.lineLow((p1 : Vector2i(x : x0, y : y0), p2 : Vector2i(x : x1, y : y1)), color)
     else:
-        echo "skipped"
+        if y0 > y1:
+            fb.lineHigh((p1 : Vector2i(x : x1, y : y1), p2 : Vector2i(x : x0, y : y0)), color)
+        else:
+            fb.lineHigh((p1 : Vector2i(x : x0, y : y0), p2 : Vector2i(x : x1, y : y1)), color)
 
-proc wireT*(fb : var FrameBuffer, triangle : VectorTriangle, buf_width : int, buf_height : int, color : Pixel) = 
-    var vertices = triangle.vertices
-    var verticesAsSeq = @[vertices.a, vertices.b, vertices.c, vertices.a]
+proc triangleWire*(fb : var FrameBuffer, triangle : RasterTrianglei,  color : Pixel) = 
+    var verticesAsSeq = @[triangle.a, triangle.b, triangle.c, triangle.a]
     # sliding window of two over vertices that wraps back around 
     # since we concatenate with vertices[0]
     for vertex_pair in windowed(verticesAsSeq, 2):
-        var x0 = ((vertex_pair[0].x + 1.0) * ((buf_width - 1)/2)).toInt
-        var x1 = ((vertex_pair[1].x + 1.0) * ((buf_width - 1)/2)).toInt
-
-        var y0 = ((vertex_pair[0].y + 1.0) * ((buf_height - 1)/2)).toInt
-        var y1 = ((vertex_pair[1].y + 1.0) * ((buf_height - 1)/2)).toInt
-        fb.line(Vector2i(x:x0, y:y0), Vector2i(x:x1, y:y1), color)
+        fb.line((p1 : vertex_pair[0], p2: vertex_pair[1]), color)

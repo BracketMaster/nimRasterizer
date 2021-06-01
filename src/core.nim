@@ -10,6 +10,10 @@ type
     y* : float32
     z* : float32
 
+  Vector2f* = object of Vector
+    x* : float32
+    y* : float32
+
   Vector3i* = object of Vector
     x* : int
     y* : int
@@ -39,7 +43,12 @@ type
     b* : TexCoord
     c* : TexCoord
 
-  RasterTriangle* = object
+  # RasterTrianglef* = object
+  #   a*  : Vector2f
+  #   b*  : Vector2f
+  #   c*  : Vector2f
+
+  RasterTrianglei* = object
     a*  : Vector2i
     b*  : Vector2i
     c*  : Vector2i
@@ -61,10 +70,10 @@ template `+`*[T : Vector2i](lhs, rhs: T) : T =
     y : lhs.y + rhs.y
   )
 
-template `*`*[T : Vector2i](lhs : float32, rhs: T) : T = 
+template `*`*[T : Vector2i](scalar : int, rhs: T) : T = 
   T(
-    x : (lhs * rhs.x.toFloat).toInt,
-    y : (lhs * rhs.y.toFloat).toInt
+    x : scalar * rhs.x,
+    y : scalar * rhs.y
   )
 
 template cross*[T : Vector3i or Vector3f](a, b : T) : T = 
@@ -89,3 +98,16 @@ template `+`*[T : Vector3f or Vector3i](lhs, rhs : T) : T =
       y : lhs.y + rhs.y,
       z : lhs.z + rhs.z,
     )
+
+proc toVector2i*(vector : Vector2f) : Vector2i = 
+  Vector2i(
+    x : vector.x.toInt,
+    y : vector.y.toInt
+  )
+
+# proc toRasterTrianglei(triangle : RasterTrianglef) : RasterTrianglei =
+#   RasterTrianglei(
+#     a : triangle.a.toVector2i,
+#     b : triangle.b.toVector2i,
+#     c : triangle.c.toVector2i
+#   )
