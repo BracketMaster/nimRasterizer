@@ -89,10 +89,6 @@ proc pointInTriangle(triangle : RasterTrianglei, P : Vector2i) : bool =
     var vAB = B - A
     var vPA = A - P
 
-    # print Vector3i(x:vAB.x, y:vAC.x, z:vPA.x)
-    # print Vector3i(x:vAB.y, y:vAC.y, z:vPA.y)
-    # print (vAC, vAB, vPA)
-
     var cross_product = cross(
         Vector3i(x:vAB.x, y:vAC.x, z:vPA.x), 
         Vector3i(x:vAB.y, y:vAC.y, z:vPA.y), 

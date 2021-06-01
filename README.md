@@ -1,10 +1,14 @@
 # nimRasterizer
 
-The Beginnings of a humble triangle rasterizer in Nim.
+The Beginnings of a humble triangle rasterizer in 100% Nim.
+
+It's a software rasterizer, A.K.A, not fast.
+Mainly a personal education project inspired by
+[tiny renderer](https://github.com/ssloy/tinyrenderer/wiki).
 
 # Status
 
-Rasterizes a human head.
+Shades a human head.
 
 ![](docs/status.png)
 

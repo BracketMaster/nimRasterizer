@@ -1,5 +1,6 @@
 import framebuffer, draw, colors
 import objReader, print, pipeline
+import core
 
 const fb_width    = 800
 const fb_height   = 600
@@ -20,10 +21,13 @@ var triangles = african_head.readOBJ
 # fb.triangleFill(myTri, WHITE)
 # fb.triangleWire(myTri, RED)
 
-var interval = 5
+var light_dir = Vector3f(x : 0, y : 0, z : -1)
 for triangle in triangles:
-    var projectedT = triangle.projectScreen(fb_width, fb_height)
-    fb.triangleFill(projectedT, WHITE)
+    var intensity = triangle.unitNormal.dot(light_dir)
+    if intensity > 0:
+        var color = (255 * intensity).toInt.uint8
+        var projectedT = triangle.projectScreen(fb_width, fb_height)
+        fb.triangleFill(projectedT, Pixel(red : color, green : color, blue : color))
 
 fb.paintPNG()
 fb.paintScreen()

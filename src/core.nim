@@ -1,27 +1,25 @@
+import math
+
 type
-  # fbCoord* = object
-  #   x*: int
-  #   y*: int
-  
   Vector = ref object of RootObj
   
-  Vector3f* = object of Vector
-    x* : float32
-    y* : float32
-    z* : float32
-
-  Vector2f* = object of Vector
-    x* : float32
-    y* : float32
-
   Vector3i* = object of Vector
     x* : int
     y* : int
     z* : int
 
+  Vector3f* = object of Vector
+    x* : float32
+    y* : float32
+    z* : float32
+
   Vector2i* = object of Vector
     x* : int
     y* : int
+
+  Vector2f* = object of Vector
+    x* : float32
+    y* : float32
 
   TexCoord* = object
     u* : float32
@@ -42,11 +40,6 @@ type
     a* : TexCoord
     b* : TexCoord
     c* : TexCoord
-
-  # RasterTrianglef* = object
-  #   a*  : Vector2f
-  #   b*  : Vector2f
-  #   c*  : Vector2f
 
   RasterTrianglei* = object
     a*  : Vector2i
@@ -76,15 +69,6 @@ template `*`*[T : Vector2i](scalar : int, rhs: T) : T =
     y : scalar * rhs.y
   )
 
-template cross*[T : Vector3i or Vector3f](a, b : T) : T = 
-    var a1 = a.x; var a2 = a.y; var a3 = a.z
-    var b1 = b.x; var b2 = b.y; var b3 = b.z
-    T(
-      x : a2*b3 - a3*b2,
-      y : -(a1*b3  - a3*b1),
-      z : (a1*b2 - a2*b1),
-    )
-
 template `-`*[T : Vector3f or Vector3i](lhs, rhs : T) : T = 
     T(
       x : lhs.x - rhs.x,
@@ -99,15 +83,40 @@ template `+`*[T : Vector3f or Vector3i](lhs, rhs : T) : T =
       z : lhs.z + rhs.z,
     )
 
+template cross*[T : Vector3i or Vector3f](a, b : T) : T = 
+    var a1 = a.x; var a2 = a.y; var a3 = a.z
+    var b1 = b.x; var b2 = b.y; var b3 = b.z
+    T(
+      x : a2*b3 - a3*b2,
+      y : -(a1*b3  - a3*b1),
+      z : (a1*b2 - a2*b1),
+    )
+
+proc dot*(a, b : Vector3f) : float = 
+  result = (a.x * b.x) + (a.y * b.y) + (a.z * b.z)
+
 proc toVector2i*(vector : Vector2f) : Vector2i = 
   Vector2i(
     x : vector.x.toInt,
     y : vector.y.toInt
   )
 
-# proc toRasterTrianglei(triangle : RasterTrianglef) : RasterTrianglei =
-#   RasterTrianglei(
-#     a : triangle.a.toVector2i,
-#     b : triangle.b.toVector2i,
-#     c : triangle.c.toVector2i
-#   )
+proc normalize(vector : Vector3f) : Vector3f= 
+  var factor = sqrt( (vector.x^2) + (vector.y^2) + (vector.z^2) )
+  Vector3f(
+    x : vector.x/factor,
+    y : vector.y/factor,
+    z : vector.z/factor
+  )
+
+proc unitNormal*(triangle : VectorTriangle) : Vector3f = 
+  var factor = 1.0
+  var verts = triangle.vertices
+
+  var A = verts.a
+  var B = verts.b
+  var C = verts.c
+
+  var vAC = verts.c - verts.a
+  var vAB = verts.b - verts.a
+  return vAC.cross(vAB).normalize
