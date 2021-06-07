@@ -73,13 +73,6 @@ proc line*(fb : var FrameBuffer, line : Line, color : Pixel) =
         else:
             fb.lineHigh((p1 : Vector2i(x : x0, y : y0), p2 : Vector2i(x : x1, y : y1)), color)
 
-proc triangleWire*(fb : var FrameBuffer, triangle : RasterTrianglei,  color : Pixel) = 
-    var verticesAsSeq = @[triangle.a, triangle.b, triangle.c, triangle.a]
-    # sliding window of two over vertices that wraps back around 
-    # since we concatenate with vertices[0]
-    for vertex_pair in windowed(verticesAsSeq, 2):
-        fb.line((p1 : vertex_pair[0], p2: vertex_pair[1]), color)
-
 proc pointInTriangle(triangle : RasterTrianglei, P : Vector2i) : bool = 
     var A = triangle.a
     var B = triangle.b
@@ -135,6 +128,13 @@ proc triangleBounds(triangle : RasterTrianglei) : bounds =
     result.right    = max(x_coords)
     result.up       = max(y_coords)
     result.down     = min(y_coords)
+
+proc triangleWire*(fb : var FrameBuffer, triangle : RasterTrianglei,  color : Pixel) = 
+    var verticesAsSeq = @[triangle.a, triangle.b, triangle.c, triangle.a]
+    # sliding window of two over vertices that wraps back around 
+    # since we concatenate with vertices[0]
+    for vertex_pair in windowed(verticesAsSeq, 2):
+        fb.line((p1 : vertex_pair[0], p2: vertex_pair[1]), color)
 
 proc triangleFill*(fb : var Framebuffer, triangle : RasterTrianglei, color : Pixel) =
     var tBounds = triangle.triangleBounds()
