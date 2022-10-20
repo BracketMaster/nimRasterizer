@@ -8,7 +8,7 @@ Mainly a personal education project inspired by
 
 # Status
 
-Shades a human head.
+Rasterizes a human head.
 
 ![](docs/status.png)
 
